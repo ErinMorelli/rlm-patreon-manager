@@ -2,6 +2,8 @@
 
 A CLI tool for viewing and downloading RLM Patreon exclusive content.
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ErinMorelli_rlm-patreon-manager&metric=alert_status)](https://sonarcloud.io/dashboard?id=ErinMorelli_rlm-patreon-manager)
+
 ---
 ### Installation
 
