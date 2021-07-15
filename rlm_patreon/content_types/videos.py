@@ -32,8 +32,6 @@ from sqlalchemy import Table, Column, Date, DateTime, Integer, String, func
 
 from rlm_patreon.content import PatreonContent
 
-from . import login_user
-
 
 class VideoContent(PatreonContent):
     """Manage Patreon video content."""
@@ -220,7 +218,7 @@ class VideoContent(PatreonContent):
                       help='List any newly added minisodes')
         @click.option('-n', '--number', default=25, show_default=True,
                       help='Number of videos to retrieve from archive')
-        @login_user(self, with_account=True)
+        @self.auto_login_user(with_account=True)
         def fn(account, number, list_):
             """Updates the the list of videos."""
             new_videos = self._update_videos(account.session_id, number)
@@ -243,7 +241,7 @@ class VideoContent(PatreonContent):
         @click.option('-d', '--dest', type=click.Path(exists=True),
                       help='Folder to download file to.')
         @click.argument('video_id')
-        @login_user(self, with_account=True)
+        @self.auto_login_user(with_account=True)
         def fn(video_id, yes, dest, account):
             """Download a video by ID."""
             video_path = self._get_download_dir(dest, account)
@@ -257,7 +255,7 @@ class VideoContent(PatreonContent):
         """Command to display video details."""
         @click.command(help='Show video details by ID')
         @click.argument('video_id')
-        @login_user(self)
+        @self.auto_login_user()
         def fn(video_id):
             """Show video details by ID."""
             video = self.get_video(video_id)
@@ -283,7 +281,7 @@ class VideoContent(PatreonContent):
         """Command to open video link in a browser."""
         @click.command(help='Open web page for video.')
         @click.argument('video_id')
-        @login_user(self)
+        @self.auto_login_user()
         def fn(video_id):
             """Open web page for video."""
             video = self.get_video(video_id)
@@ -305,7 +303,7 @@ class VideoContent(PatreonContent):
                       show_default=True, help='How to format the list.')
         @click.option('-s', '--search',
                       help='Search videos by title.')
-        @login_user(self, with_account=True)
+        @self.auto_login_user(with_account=True)
         def fn(account, number, refresh, fmt, search=None):
             """Show all available videos."""
             if refresh:

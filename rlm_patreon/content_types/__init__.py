@@ -15,18 +15,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see [https://www.gnu.org/licenses/].
 """
 
-__all__ = ['videos', 'login_user']
+from pathlib import Path
+from inspect import isclass
+from pkgutil import iter_modules
+from importlib import import_module
+
+from rlm_patreon.content import PatreonContent
 
 
-def login_user(content, with_account=False):
-    """Decorator to automatically log user in for CLI actions."""
-    def inner(func):
-        def wrapper(*args, **kwargs):
-            account = content.login_user()
-            if not account:
-                return
-            if with_account:
-                kwargs['account'] = account
-            func(*args, **kwargs)
-        return wrapper
-    return inner
+__all__ = ['get_content_types']
+
+
+def get_content_types():
+    """Dynamically build a list of all content types in the module."""
+    types = []
+    package_dir = Path(__file__).resolve().parent
+
+    # Iterate over the modules within the package
+    for (_, module_name, _) in iter_modules([package_dir]):
+        module = import_module(f"{__name__}.{module_name}")
+
+        # Get each module attribute
+        for attribute_name in dir(module):
+            attribute = getattr(module, attribute_name)
+
+            # Check for child classes of the base content class
+            if isclass(attribute) and issubclass(attribute, PatreonContent):
+                types.append(attribute)
+
+    # Return the list of type classes
+    return types

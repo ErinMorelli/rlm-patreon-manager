@@ -17,7 +17,7 @@ along with this program.  If not, see [https://www.gnu.org/licenses/].
 
 from .manager import PatreonManager
 
-__all__ = ['content', 'manager']
+__all__ = ['manager', 'PatreonManager']
 
 
 def cli():

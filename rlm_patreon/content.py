@@ -28,8 +28,6 @@ from sqlalchemy.dialects.sqlite import BLOB
 from sqlalchemy import Table, Column, String, DateTime, func
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
-from rlm_patreon.content_types import login_user
-
 
 class PatreonContent:
     """Base content class that also provides account access."""
@@ -55,6 +53,19 @@ class PatreonContent:
         self.manager = manager
         self.db = self.manager.get_session()
         self.model = self.manager.models.get(self.model_name)
+
+    def auto_login_user(self, with_account=False):
+        """Decorator to automatically log user in for CLI actions."""
+        def inner(fn):
+            def wrapper(*args, **kwargs):
+                account = self.login_user()
+                if not account:
+                    return
+                if with_account:
+                    kwargs['account'] = account
+                fn(*args, **kwargs)
+            return wrapper
+        return inner
 
     def session(self, session_id):
         """Create a new API session with the correct cookies and headers."""
@@ -274,7 +285,7 @@ class PatreonContent:
         @click.command(help='Update account information.')
         @click.option('--download_dir', type=click.Path(exists=True),
                       help='Set path where files will be downloaded.')
-        @login_user(self, with_account=True)
+        @self.auto_login_user(with_account=True)
         def fn(download_dir, account):
             """Update account information."""
             if not download_dir:
@@ -290,7 +301,7 @@ class PatreonContent:
     def show(self):
         """Command to show account info."""
         @click.command(help='Display account information.')
-        @login_user(self, with_account=True)
+        @self.auto_login_user(with_account=True)
         def fn(account):
             """Display account information."""
             form = u'{0:>15}: {1}'
