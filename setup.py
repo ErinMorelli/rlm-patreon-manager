@@ -46,6 +46,7 @@ setup(
         'SQLAlchemy-Utils',
         'tabulate',
         'tqdm',
-        'vimeo-downloader'
+        'vimeo-downloader',
+        'yaspin'
     ],
 )

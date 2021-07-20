@@ -20,6 +20,9 @@ import os
 import click
 from requests import Session, RequestException, cookies
 
+from yaspin import yaspin
+from yaspin.spinners import Spinners
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -58,7 +61,8 @@ class PatreonContent:
         """Decorator to automatically log user in for CLI actions."""
         def inner(fn):
             def wrapper(*args, **kwargs):
-                account = self.login_user()
+                with yaspin(spinner=Spinners.line):
+                    account = self.login_user()
                 if not account:
                     return
                 if with_account:
@@ -142,12 +146,16 @@ class PatreonContent:
             return account
 
         # Make the login request
-        success = self._make_login_request(
+        session = self._make_login_request(
             account.email,
             self.manager.decode(account.password)
         )
-        if not success:
+        if not session:
             return None
+
+        # Store new session
+        account.session = session
+        self.db.commit()
 
         # Return the logged in account
         return account
