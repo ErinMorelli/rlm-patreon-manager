@@ -5,3 +5,4 @@ dist/
 
 environ.sh
 test.py
+.autoenv.zsh

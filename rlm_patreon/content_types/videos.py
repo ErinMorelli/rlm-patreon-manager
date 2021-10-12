@@ -24,13 +24,15 @@ import click
 from tqdm import tqdm
 from pyquery import PyQuery
 from dateutil import parser
-from vimeo_downloader import Vimeo
 from tabulate import tabulate, tabulate_formats
+from vimeo_downloader import Vimeo, RequestError
 
 from sqlalchemy_utils.types import URLType
 from sqlalchemy import Table, Column, Date, DateTime, Integer, String, func
 
 from rlm_patreon.content import PatreonContent
+
+from pprint import pprint
 
 
 class VideoContent(PatreonContent):
@@ -247,7 +249,10 @@ class VideoContent(PatreonContent):
             video_path = self._get_download_dir(dest, account)
             video = self.get_video(video_id)
             if video:
-                self._download_video(video, video_path, yes)
+                try:
+                    self._download_video(video, video_path, yes)
+                except RequestError as exc:
+                    self.manager.error(str(exc))
         return fn
 
     @property
